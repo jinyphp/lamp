@@ -1,0 +1,29 @@
+{
+    "name": "jiny/lamp",
+    "description": "jiny console",
+    "keywords": [
+        "jiny",
+        "framwork",
+        "console",
+        "lamp"
+    ],
+    "homepage": "http://jiny.hojin.io",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "hojinlee",
+            "email": "infohojin@gmail.com",
+            "homepage": "http://hojin.io"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">= 7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jiny\\Lamp\\": "src/"
+        }
+    }
+}

@@ -1,0 +1,15 @@
+사용법:
+php lamp 명령어 [옵션] [인자]
+
+옵션:
+  -h, --help            Display this help message
+  -V, --version         Display this application version
+
+명령어:
+theme       테마목록을 출력합니다.
+theme:make  테마를 생성합니다.
+
+ftp FTP접속을 테스트 합니다.
+ftp:ls 경로 경로에 맞는 ftp 파일목록을 출력합니다.
+
+ftp:deploy 경로

@@ -44,14 +44,17 @@ class Parser
 
     public function exHead()
     {
+        /*
         echo "문서에서 HEAD 영역을 분리합니다.\n";
         $head = $this->getTagBody($this->_html, "<head");
         file_put_contents($this->_path.$this->_theme.DS."head.htm", $head );
-        $this->_html = str_replace($head, "{% include 'head.htm' %}", $this->_html);
+        $this->_html = str_replace($head, "{(head)}", $this->_html);
 
         echo "문서에서 BODY 영역을 분리합니다.\n";
         $body = $this->getTagBody($this->_html, "<body");
         $this->_body = $body;
+        */
+        
 
         return $this;
     }
@@ -72,9 +75,9 @@ class Parser
 
         $this->exIndex();
 
-        $this->_html = str_replace($header, "{% include header.htm %}", $this->_html);
-        $this->_html = str_replace($nav, "{% include nav.htm %}", $this->_html);
-        $this->_html = str_replace($footer, "{% include footer.htm %}", $this->_html);
+        $this->_html = str_replace($header, "{(header)}", $this->_html);
+        $this->_html = str_replace($nav, "{(nav)}", $this->_html);
+        $this->_html = str_replace($footer, "{(footer)}", $this->_html);
 
     }
 
@@ -114,13 +117,14 @@ class Parser
         // 
         echo "본문은 $start ~ $end 까지 입니다.\n";
         $string = substr ($this->_html, $start, ($end-$start));        
-        $this->_html = str_replace($string, "\n{% include index.htm %}\n", $this->_html);
+        $this->_html = str_replace($string, "\n{(content)}\n", $this->_html);
             // 바디 저장
-
+/*
             $string ="---
 layout: layout
 ---
 ".$string;
+*/
         file_put_contents($this->_path.$this->_theme.DS."index.htm", $string);
     }
 

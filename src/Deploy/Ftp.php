@@ -14,6 +14,8 @@ class Ftp
 
     public $_rootFTP = [];
     public $_rootLocal;
+
+    public $_serverType;
     
     public function __construct($cli)
     {
@@ -24,6 +26,7 @@ class Ftp
         if ($this->connect($_info)) {
             echo "Connected as ".$_info['user']."@".$_info['host']."\n";
             $this->setPassiveMode();
+            $this->_serverType = $_info['server'];
         } else {
             echo "Couldn't connect as ".$_info['user']."\n";
         }
@@ -293,28 +296,36 @@ class Ftp
             foreach ($arr as $v) {
                 //echo $v."\n";
                 $info = array();
-                $vinfo = preg_split("/[\s]+/", $v, 9);
-                //print_r($vinfo);
 
-                if ($vinfo[0] !== "total") {
-                    $info['chmod'] = $vinfo[0];
-                    $info['type'] = $vinfo[0]{0} === 'd' ? 'directory' : 'file'; 
+                if($this->_serverType == "linux"){
+                    // Linux 서버 파싱
+                    
+                    $vinfo = preg_split("/[\s]+/", $v, 9);
+                    //print_r($vinfo);
 
-                    $info['num'] = $vinfo[1];
-                    $info['owner'] = $vinfo[2];
-                    $info['group'] = $vinfo[3];
-                    $info['size'] = $vinfo[4];
-
-                    $info['month'] = $vinfo[5];
-                    $info['day'] = $vinfo[6];
-                    $info['time'] = $vinfo[7];
-
-                    $info['name'] = $vinfo[8];
-
-                    $info['timestamp'] = strtotime($info['month']." ".$info['day']." ".$info['time']);
-              
-                    $rawlist[$info['name']] = $info;
+                    if ($vinfo[0] !== "total") {
+                        $info['chmod'] = $vinfo[0];
+                        $info['type'] = $vinfo[0]{0} === 'd' ? 'directory' : 'file'; 
+    
+                        $info['num'] = $vinfo[1];
+                        $info['owner'] = $vinfo[2];
+                        $info['group'] = $vinfo[3];
+                        $info['size'] = $vinfo[4];
+    
+                        $info['month'] = $vinfo[5];
+                        $info['day'] = $vinfo[6];
+                        $info['time'] = $vinfo[7];
+    
+                        $info['name'] = $vinfo[8];
+    
+                        $info['timestamp'] = strtotime($info['month']." ".$info['day']." ".$info['time']);
+                  
+                        $rawlist[$info['name']] = $info;
+                    }
+                } else {
+                    // windows 서버 파싱
                 }
+                
             }
 
             return $rawlist;

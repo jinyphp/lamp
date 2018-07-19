@@ -12,6 +12,9 @@ class Client
     public $_conn;
     public $_ignore;
 
+    public $_server;
+    public $_serverType;
+
     use Cmd, Process, Ignore;
 
     public function __construct($cli)
@@ -21,22 +24,22 @@ class Client
         $this->CLI = $cli;
         $this->_ignore = $this->ignoreData();
 
-        /*
-        print_r($this->_ignore);
-        $path = "/vendor/jiny";
-        if ($this->isIgnore($path)) {
-            echo "ignore\n";
-        } else {
-            echo "pass\n";            
-        }
-        */
-
-
         // FTP접속 및 로그인
         $_info = $this->ftpInfo();
         if ($this->connect($_info)) {
-            echo "Connected as ".$_info['user']."@".$_info['host']."\n";
+            echo $this->_server." Connected as ".$_info['user']."@".$_info['host']."\n";
             $this->setPassiveMode();
+            $this->_serverType = $_info['server'];
+
+            // 배포 루트 디렉토리 설정시
+            if (isset($_info['root'])) {
+                $root = \explode("/",$_info['root']);
+                foreach ($root as $name ){
+                    $this->cd($name); 
+                }
+                $this->pwd(); 
+            }
+
         } else {
             echo "Couldn't connect as ".$_info['user']."\n";
         }
@@ -46,7 +49,18 @@ class Client
     public function ftpInfo()
     {
         $user = include ".ftpconfig.php";
-        return $user['default'];
+
+        if (isset($this->CLI->_argv[3])) {
+            $key = $this->CLI->_argv[3];
+            $this->_server = $key;
+            
+            if ($user[$key]) return $user[$key];
+        }
+
+        $key = $user['default'];
+        $this->_server = $key;
+
+        return $user[$key];
     }
 
     public function connect($_server)
@@ -74,27 +88,34 @@ class Client
             foreach ($arr as $v) {
                
                 $info = array();
+                
                 $vinfo = preg_split("/[\s]+/", $v, 9);
-
-                if ($vinfo[0] !== "total") {
-                    $info['chmod'] = $vinfo[0];
-                    $info['type'] = $vinfo[0]{0} === 'd' ? 'directory' : 'file'; 
-
-                    $info['num'] = $vinfo[1];
-                    $info['owner'] = $vinfo[2];
-                    $info['group'] = $vinfo[3];
-                    $info['size'] = $vinfo[4];
-
-                    $info['month'] = $vinfo[5];
-                    $info['day'] = $vinfo[6];
-                    $info['time'] = $vinfo[7];
-
-                    $info['name'] = $vinfo[8];
-
-                    $info['timestamp'] = strtotime($info['month']." ".$info['day']." ".$info['time']);
-              
-                    $rawlist[$info['name']] = $info;
+                if ($this->_serverType == "linux") {
+                    // Linux 서버 체크
+                    if ($vinfo[0] !== "total") {
+                        $info['chmod'] = $vinfo[0];
+                        $info['type'] = $vinfo[0]{0} === 'd' ? 'directory' : 'file'; 
+    
+                        $info['num'] = $vinfo[1];
+                        $info['owner'] = $vinfo[2];
+                        $info['group'] = $vinfo[3];
+                        $info['size'] = $vinfo[4];
+    
+                        $info['month'] = $vinfo[5];
+                        $info['day'] = $vinfo[6];
+                        $info['time'] = $vinfo[7];
+    
+                        $info['name'] = $vinfo[8];
+    
+                        $info['timestamp'] = strtotime($info['month']." ".$info['day']." ".$info['time']);
+                  
+                        $rawlist[$info['name']] = $info;
+                    }
+                } else {
+                    // Windows 서버 체크
                 }
+
+                
             }
 
             return $rawlist;

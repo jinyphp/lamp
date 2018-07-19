@@ -29,6 +29,7 @@ trait Cmd
         $dir = \explode("/",$path);     
         foreach ($dir as $value) {       
             if ($value) {
+                //echo ">>>>>>".$value."\n";
                 if (@ftp_chdir($this->_conn, $value)) {
                     echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
                 } else { 
@@ -47,9 +48,9 @@ trait Cmd
     public function mkdir($path)
     {
         if (ftp_mkdir($this->_conn, $path)) {
-            echo "successfully created ".$path;
+            echo "successfully created ".$path."\n";
         } else {
-            echo "There was a problem while creating ".$path;
+            echo "There was a problem while creating ".$path."\n";
         }
     }
 

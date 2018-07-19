@@ -27,7 +27,9 @@ class Server
             // $this->ftp_chPath($this->CLI->_argv[2]);
             $path = $this->CLI->_argv[2];
             $path = \rtrim($path,"/");
-            $this->FTP->mkcd($path);                   
+
+            if(is_dir($path)) $this->FTP->mkcd($path);                   
+            
             $this->deployNew($path, 0, str_replace("/", DS, $path));
         } else {
             echo "배포할 디렉토리가 없습니다.\n";
@@ -50,7 +52,8 @@ class Server
           
         if (is_dir($dir)) {
             // 디렉토리
-            // 목록을 배열로 가지고 옵니다. 
+            // 목록을 배열로 가지고 옵니다.
+            echo $dir." 디렉토리를 검사합니다.\n"; 
             foreach (scandir($dir) as $value) {
 
                 // . .. 은 제외합니다.
@@ -67,6 +70,7 @@ class Server
                         continue;
                     } 
 
+                    //echo $value."는 디렉토리 입니다.\n"; 
                     $this->deployDirectory($dir, $value, $level++);
                    
                 } else {
@@ -86,7 +90,19 @@ class Server
             $level--;            
         } else {
             // 파일.
-            echo "디렉토리가 아닙니다.";
+            // echo $dir."는 파일입니다.\n";
+            echo "│  ".$dir;             
+            // 제외파일 및 디렉토리 검사 
+            $info = \pathinfo($dir);
+            $value = $info['basename'];
+            if($this->FTP->isIgnore($info['dirname'], $info['basename'])) {
+                echo "\t =ingore ".$dir .$value;
+                echo "\n";                  
+            } else {
+                $this->deployFile($info['dirname'], $info['basename'], $node);
+                echo "\n";
+            }         
+            //
         }
 
     }
@@ -124,16 +140,20 @@ class Server
             case 'update':
             default:          
                 //echo "...";
-                $mdtm = $node[$value]['timestamp'];
-                $timestamp = filemtime($dir.DS.$value);       
-              
-                if($timestamp > $mdtm) {
-                    //echo "\t...update ";
-                    //echo "...new";
-                    $this->FTP->upload($dir.DS.$value, $value);
+                if (isset($node[$value]['timestamp'])) {
+                    $mdtm = $node[$value]['timestamp'];
+                    $timestamp = filemtime($dir.DS.$value);
+
+                    if($timestamp > $mdtm) {
+                        //echo "\t...update ";
+                        //echo "...new";
+                        $this->FTP->upload($dir.DS.$value, $value);
+                    } else {
+                        // echo "...old";
+                    }
                 } else {
-                    // echo "...old";
-                }
+                    $this->FTP->upload($dir.DS.$value, $value);
+                }       
                 break;
         }
        

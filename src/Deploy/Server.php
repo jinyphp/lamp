@@ -21,15 +21,20 @@ class Server
         $this->FTP = new \Jiny\Lamp\Ftp\Client($cli);
     }
 
+    /**
+     * 배포 프로세서
+     */
     public function process()
     {
         if (isset($this->CLI->_argv[2])) {
-            // $this->ftp_chPath($this->CLI->_argv[2]);
             $path = $this->CLI->_argv[2];
             $path = \rtrim($path,"/");
 
-            if(is_dir($path)) $this->FTP->mkcd($path);                   
-            
+            // 배포경로로 이동
+            if(is_dir($path)) {
+                $this->FTP->mkcd($path);                   
+            }
+
             $this->deployNew($path, 0, str_replace("/", DS, $path));
         } else {
             echo "배포할 디렉토리가 없습니다.\n";
@@ -107,13 +112,16 @@ class Server
 
     }
 
+    /**
+     * 디렉토리를 배포합니다.
+     */
     public function deployDirectory($dir, $value, $level)
     {
         echo "\t";
         if ($this->FTP->cd($value)) {
             //echo "  Current directory is now: " . $this->FTP->pwd()."\n";                      
         } else { 
-            $this->FTP->mkdir($value);
+            $this->FTP->_mkdir($value);
             $this->FTP->cd($value);
             //echo "Create directory is now: " . $this->FTP->pwd()."\n";                                                    
         }
@@ -122,6 +130,10 @@ class Server
         $this->FTP->up();
     }
 
+
+    /**
+     * 파일을 배포합니다.
+     */
     public function deployFile($dir, $value, $node)
     {   
         $mode = $this->CLI->_command;
@@ -129,35 +141,45 @@ class Server
             $mode = "upload";
         }
 
-        //echo " mode=".$mode." ";
-
         switch($mode){ 
             case 'upload':
-                //echo "\t...upload ";
-                $this->FTP->upload($dir.DS.$value, $value);
+                $this->upload($dir, $value);
                 break;
 
             case 'update':
             default:          
-                //echo "...";
-                if (isset($node[$value]['timestamp'])) {
-                    $mdtm = $node[$value]['timestamp'];
-                    $timestamp = filemtime($dir.DS.$value);
-
-                    if($timestamp > $mdtm) {
-                        //echo "\t...update ";
-                        //echo "...new";
-                        $this->FTP->upload($dir.DS.$value, $value);
-                    } else {
-                        // echo "...old";
-                    }
-                } else {
-                    $this->FTP->upload($dir.DS.$value, $value);
-                }       
+                $this->update($dir, $value, $node);  
                 break;
         }
        
         
+    }
+
+    /**
+     * 파일을 업로드 합니다.
+     */
+    public function upload($dir, $value)
+    {
+        $this->FTP->_upload($dir.DS.$value, $value);
+    }
+
+    /**
+     * 파일을 갱신합니다.
+     */
+    public function update($dir, $value, $node)
+    {
+        if (isset($node[$value]['timestamp'])) {
+            $mdtm = $node[$value]['timestamp'];
+            $timestamp = filemtime($dir.DS.$value);
+
+            if($timestamp > $mdtm) {
+                $this->FTP->_upload($dir.DS.$value, $value);
+            } else {
+                // echo "...old";
+            }
+        } else {
+            $this->FTP->_upload($dir.DS.$value, $value);
+        }
     }
 
     /**

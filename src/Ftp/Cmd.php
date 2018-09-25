@@ -6,84 +6,78 @@ use \Jiny\Core\Registry\Registry;
 
 trait Cmd
 {
-    /**
-     * FTP 디렉토리를 변경합니다.
-     */
-    public function cd($path)
-    {
-        if (@ftp_chdir($this->_conn, $path)) {
-            echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
-            return true;
-        } else { 
-            echo "Couldn't change directory\n";
-            return false;
-        }
-    }
-
-    /**
-     * FTP 디렉토리를 변경합니다.
-     * 디렉토리가 없는 경우 생성을 합니다.
-     */
-    public function mkcd($path)
-    {      
-        $dir = \explode("/",$path);     
-        foreach ($dir as $value) {       
-            if ($value) {
-                //echo ">>>>>>".$value."\n";
-                if (@ftp_chdir($this->_conn, $value)) {
-                    echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
-                } else { 
-                    // echo "Couldn't change directory ";
-                    $this->mkdir($value);
-                    ftp_chdir($this->_conn, $value);
-                    echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
-                } 
-            }               
-        }
-    }
-
+    
     /**
      * FTP 디렉토리를 생성합니다.
      */
-    public function mkdir($path)
+    public function mkdir($argv)
+    {
+        if (isset($argv[2])) {
+            echo "디렉토리를 생성 합니다.\n";
+            $path = $argv[2];
+            $this->_mkdir($path);           
+
+            echo "\n";
+        } else {
+            echo "생성할 디렉토리가 없습니다..\n";
+        }        
+    }
+
+    /**
+     * 디렉토리 생성 구현체
+     */
+    public function _mkdir($path)
     {
         if (ftp_mkdir($this->_conn, $path)) {
-            echo "successfully created ".$path."\n";
+            echo "successfully created ".$path;
         } else {
-            echo "There was a problem while creating ".$path."\n";
+            echo "There was a problem while creating ".$path;
         }
     }
 
+    /**
+     * 디렉토리를 삭제합니다.
+     */
     public function rmdir($path)
     {
-        if (ftp_rmdir($this->_conn, $path)) {
-            echo "successfully removed ".$path;
+        if (isset($argv[2])) {
+            echo "디렉토리를 삭제 합니다.\n";
+            $path = $argv[2];
+
+            if (ftp_rmdir($this->_conn, $path)) {
+                echo "successfully removed ".$path."\n";
+            } else {
+                echo "There was a problem while removing ".$path."\n";
+            }
+
         } else {
-            echo "There was a problem while removing ".$path;
+            echo "삭제할 디렉토리가 없습니다..\n";
+        }   
+    }
+
+
+    /**
+     * 파일을 업로드 합니다.
+     */
+    public function upload($argv)
+    {
+        if (isset($argv[2])) {
+            $src = $argv[2];
+            $file = basename($src);
+            echo $src."=>".$file;
+            $this->_upload($src, $file);            
+
+            echo "\n";
+        } else {
+            echo "업로드 파일명이 없습니다.\n";
         }
+        
     }
 
     /**
-     * FTP 현재의 경로를 반환합니다.
+     * 실제 업로드 구현체
      */
-    public function pwd()
-    {
-        return ftp_pwd($this->_conn);
-    }
-
-    /**
-     * FTP 상위 디렉토리 이동합니다.
-     */
-    public function up()
-    {
-        if (ftp_cdup($this->_conn)) { 
-            //echo "cdup successful\n";
-        } else {
-            //echo "cdup not successful\n";
-        }
-    }
-
-    public function upload($src, $file)
+    public function _upload($src, $file)
     {
         $fp = fopen($src, 'r');
         // try to upload $file
@@ -94,6 +88,75 @@ trait Cmd
         }
 
         fclose($fp);
+    }
+
+    /**
+     * ftp 설정파일을 복사합니다.
+     */
+    public function init()
+    {
+        // Page 3.284
+        if (file_exists(".ftpconfig.php")) {
+            echo "ftp 설정파일이 존재합니다.";
+
+        } else {
+            $file = "./vendor/jiny/lamp/.ftpconfig.php";
+            if (file_exists($file)) {
+                if (copy($file, ".ftpconfig.php")) {
+                    echo "기본 설정파일(.ftpconfig.php)을 복사합니다.\n";
+                } else {
+                    echo "설정파일 복사를 할 수 없습니다.\n";
+                }
+            } else {
+                echo "수동으로 생성해 주세요.\n";
+            }
+
+            $file = "./vendor/jiny/lamp/.ftpignore";
+            if (file_exists($file)) {
+                if (copy($file, ".ftpignore")) {
+                    echo "기본 설정파일(.ftpignore)을 복사합니다.\n";
+                } else {
+                    echo "설정파일 복사를 할 수 없습니다.\n";
+                }
+            } else {
+                echo "수동으로 생성해 주세요.\n";
+            }
+
+
+        }
+    }
+
+
+
+    public function rm($argv)
+    {
+        if (isset($argv[2])) {
+            echo "파일을 삭제 합니다.\n";
+            if (ftp_delete($this->_conn, $argv[2])) {
+                echo $argv[2]." deleted successful\n";
+            } else {
+                echo "could not delete ".$argv[2]."\n";
+            }
+
+        } else {
+            echo "삭제할 파일명이 없습니다..\n";
+        }        
+    }
+
+    public function ls($argv)
+    {
+        if (isset($argv[2])) {
+            echo "목록을 출력합니다.\n";
+            $path = $argv[2];
+
+            $arr = ftp_rawlist($this->_conn, $path);
+            foreach ($arr as $value) {
+                echo $value."\n";
+            }
+
+        } else {
+            echo "서버 폴더 경로명이 없습니다.\n";
+        }        
     }
 
     /**

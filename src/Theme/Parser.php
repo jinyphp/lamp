@@ -1,5 +1,5 @@
 <?php
-namespace Jiny\Lamp;
+namespace Jiny\Lamp\Theme;
 
 use \Jiny\Core\Registry;
 
@@ -21,7 +21,6 @@ class Parser
 
     public function __construct()
     {
-        //echo __CLASS__." 객체를 생성하였습니다.\n";
         $this->_path = "./theme/";
     }
 

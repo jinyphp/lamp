@@ -19,33 +19,57 @@ class Client
 
     public function __construct($cli)
     {
-        //echo __CLASS__."를 생성합니다.\n";
-        // ignore 처리
         $this->CLI = $cli;
-        $this->_ignore = $this->ignoreData();
 
-        // FTP접속 및 로그인
-        $_info = $this->ftpInfo();
-        if ($this->connect($_info)) {
-            echo $this->_server." Connected as ".$_info['user']."@".$_info['host']."\n";
-            $this->setPassiveMode();
-            $this->_serverType = $_info['server'];
+        if (extension_loaded('ftp')) {
 
-            // 배포 루트 디렉토리 설정시
-            if (isset($_info['root'])) {
-                $root = \explode("/",$_info['root']);
-                foreach ($root as $name ){
-                    $this->cd($name); 
+            if ($this->CLI->_command == "init") {
+                // 초기화 명령은 접속하지 않음.
+
+            } else {
+                // FTP접속 및 로그인
+                $_info = $this->ftpInfo();
+                if ($this->connect($_info)) {
+                    // ignore 처리            
+                    $this->_ignore = $this->ignoreData();
+
+                    echo $this->_server." Connected as ".$_info['user']."@".$_info['host']."\n";
+                    $this->_serverType = $_info['server'];
+                    if ($_info['mode'] == "passive") {
+                        $this->setPassiveMode();
+                    }                  
+            
+                    // 배포 루트 디렉토리 설정시
+                    $this->rootInit($_info);
+
+                } else {
+                    echo "Couldn't connect as ".$_info['user']."\n";
                 }
-                $this->pwd(); 
-            }
+            }          
 
         } else {
-            echo "Couldn't connect as ".$_info['user']."\n";
+            echo "please, check enable ftp extension in php.ini";
+            exit;
         }
-
     }
 
+    /**
+     * 배포 루트 디렉토리 설정시
+     */
+    public function rootInit($_info)
+    {
+        if (isset($_info['root'])) {
+            $root = \explode("/",$_info['root']);
+            foreach ($root as $name ){
+                $this->cd($name); 
+            }
+            $this->pwd(); 
+        }
+    }
+
+    /**
+     * 설정파일을 읽어옵니다.
+     */
     public function ftpInfo()
     {
         $user = include ".ftpconfig.php";
@@ -60,11 +84,15 @@ class Client
         $key = $user['default'];
         $this->_server = $key;
 
+        
+
         return $user[$key];
     }
 
     public function connect($_server)
     { 
+        echo "connect to ".$_server['host']."\n";
+
         // set up a connection or die
         $this->_conn = ftp_connect($_server['host']) or die("Couldn't connect to ".$_server['host']);
 
@@ -72,6 +100,9 @@ class Client
         return ftp_login($this->_conn, $_server['user'], $_server['pass']);  
     }
 
+    /**
+     * 패시브 모드
+     */
     public function setPassiveMode()
     {
         // turn passive mode on
@@ -123,11 +154,72 @@ class Client
 
     }
 
+        /**
+     * FTP 현재의 경로를 반환합니다.
+     */
+    public function pwd()
+    {
+        return ftp_pwd($this->_conn);
+    }
+
+    /**
+     * FTP 상위 디렉토리 이동합니다.
+     */
+    public function up()
+    {
+        if (ftp_cdup($this->_conn)) { 
+            //echo "cdup successful\n";
+        } else {
+            //echo "cdup not successful\n";
+        }
+    }
+
+    /**
+     * FTP 디렉토리를 변경합니다.
+     */
+    public function cd($path)
+    {
+        if (@ftp_chdir($this->_conn, $path)) {
+            echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
+            return true;
+        } else { 
+            echo "Couldn't change directory\n";
+            return false;
+        }
+    }
+
+    /**
+     * FTP 디렉토리를 변경합니다.
+     * 디렉토리가 없는 경우 생성을 합니다.
+     */
+    public function mkcd($path)
+    {      
+        $dir = \explode("/",$path);     
+        foreach ($dir as $value) {       
+            if ($value) {
+                //echo ">>>>>>".$value."\n";
+                if (@ftp_chdir($this->_conn, $value)) {
+                    echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
+                } else { 
+                    // echo "Couldn't change directory ";
+                    $this->mkdir($value);
+                    ftp_chdir($this->_conn, $value);
+                    echo "Current directory is now: " . ftp_pwd($this->_conn) . "\n";
+                } 
+            }               
+        }
+    }
+
+    /**
+     * FTP 접속을 종료합니다.
+     */
     public function __destruct()
     {
         // close the connection
-        ftp_close($this->_conn);  
-        echo "FTP 접속을 종료합니다.";        
+        if ($this->_conn) {
+            ftp_close($this->_conn);  
+            echo "FTP 접속을 종료합니다."; 
+        }   
     }
     
     /**

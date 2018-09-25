@@ -23,37 +23,36 @@ class CLI extends CliAbstract
 
     public function __construct($argv)
     {
-        //echo __CLASS__."를 생성합니다.\n";
         if($argv) {
             $this->_argv = $argv;
-            
-            if (isset($argv[1])) {
-                $cmd = \explode(":", $argv[1]);
-                if(isset($cmd[0])) $this->_class = $cmd[0];
-                if(isset($cmd[1])) $this->_method = $cmd[1];
-    
-                $this->fileSystem = new Filesystem();
-                $this->ThemeParser = new \Jiny\Lamp\Parser;
-                $this->CURL = new \Jiny\Lamp\CURL\Curl;
+            $this->parser($argv);         
+        } else {
+            $this->help();
+        }        
+    }
 
-                $this->File = new \Jiny\Lamp\File($this);
-    
-                if (isset($argv[1])) {
-                    $this->process($argv);
-                } else {
-                    echo "인자값이 없습니다.\n";
-                }
-    
-            } else {
-                // help 메세지를 출력합니다.
-                echo "CLI Lamp ".self::VERSION."\n";
-                $msg = file_get_contents("./vendor/jiny/lamp/src/Help");
-                echo $msg;
-            }
+    private function help()
+    {
+        echo "CLI Lamp ".self::VERSION."\n\n";
 
-            
-        }       
-        
+        $path = ".".DS."vendor".DS."jiny".DS."lamp".DS."src".DS."Help";
+        $msg = file_get_contents($path);
+        echo $msg;
+    }
+
+    private function parser($argv)
+    {
+        if ($this->isAction($argv)) {
+            $cmd = \explode(":", $argv[1]);
+            if(isset($cmd[0])) $this->_class = $cmd[0];
+            if(isset($cmd[1])) $this->_method = $cmd[1];
+
+            $this->fileSystem = new Filesystem();            
+            $this->CURL = new \Jiny\Lamp\CURL\Curl;
+            $this->File = new \Jiny\Lamp\File($this);
+
+            $this->process($argv);
+        }        
     }
 
     
@@ -64,81 +63,43 @@ class CLI extends CliAbstract
                 $this->version();
                 break;
 
-            case 'theme':
-                $this->_class = new \Jiny\Lamp\ThemeCLI($this);            
-                if(isset($cmd[1])){
-                    if (method_exists($this->_class, $this->_method)) {
-                        echo "메서드가 있습니다.";
-                    }
+            default:
+                $this->isMode($argv[1]);
+                $mode = $this->_mode;
+                if (method_exists($this, $mode)) {
+                    $this->$mode()->process();
                 } else {
-                    // 클래스 __invoke() 실행
-                    ($this->_class)();
-                }
-                break;
-
-            case 'theme:make':
-                $cli = new \Jiny\Lamp\ThemeCLI($this);
-                $cmd = \explode(":", $argv[1]);
-                
-                if(isset($this->_method)){
-                    if (method_exists($cli, $this->_method)) {
-                        echo "메서드가 있습니다.";
-                        $method = $this->_method;
-                        if(isset($argv[2])){
-                            $cli->$method($argv[2]);
-                        } else {
-                            echo "테마명을 입력해 주세요\n";
-                        }     
-                    }
-                }
-                break;
-
-            case 'theme:del':
-                echo $argv[2]." 를 삭제합니다.\n";
-                if ($argv[2]) {
-                    $this->fileSystem->remove("./theme/".$argv[2]);            
-                }
-                break;
-
-            case 'theme:parser':
-                echo $argv[2]." 를 분석합니다.\n";
-                if ($argv[2]) {
-                    $str = file_get_contents("./theme/".$argv[2]."/temp.htm");
-                    $this->ThemeParser->setTheme($argv[2]);
-                    $this->ThemeParser->process($str);
-                }
-                break;
-
-            case 'theme:geturl':
-                $cli = new \Jiny\Lamp\ThemeCLI($this);
-                $cli->geturl($argv);
-
-                
-                break;
-            case 'theme:set':
-                
-                    break;
-
+                    echo "명령이 없습니다.";
+                } 
+               
         }
-
         
-
-        /////////////////////
-        $key = \explode(":", $argv[1]);
-        if (isset($key[0])) $this->_mode = $key[0];
-        if (isset($key[1])) $this->_command = $key[1];
-        switch ($this->_mode) {
-            case 'ftp':
-                $this->ftp(); 
-                break;
-            case 'deploy':
-                $this->deploy();
-                break;
-        }
-
         // 메모리 삭제
         unset($cli);
+    }
 
+    public function isAction($argv)
+    {
+        if (isset($argv[1])) {
+            return true;
+        } else {
+            // help 메세지를 출력합니다.
+            $this->help();
+            return false;
+        }
+    }
+
+    public function isMode($key)
+    {
+        $arr = \explode(":", $key);
+        if (isset($arr[0])) {
+            $this->_mode = $arr[0];
+        }
+        if (isset($arr[1])) {
+            $this->_command = $arr[1];
+        }
+
+        return $arr;
     }
 
     /**
@@ -146,8 +107,7 @@ class CLI extends CliAbstract
      */
     public function ftp()
     {
-        $cli = new \Jiny\Lamp\FTP\Client($this);
-        $cli->process();
+        return new \Jiny\Lamp\FTP\Client($this);
     }
 
     /**
@@ -155,10 +115,20 @@ class CLI extends CliAbstract
      */
     public function deploy()
     {
-        $cli = new \Jiny\Lamp\Deploy\Server($this);
-        $cli->process();
+        return new \Jiny\Lamp\Deploy\Server($this);
     }
-    
+
+    public function theme()
+    {
+        return new \Jiny\Lamp\Theme\Theme($this);
+    }
+
+    public function menu()
+    {
+        return new \Jiny\Lamp\Menu\Menu($this);
+    }
+
+
     /**
      * Class End
      */

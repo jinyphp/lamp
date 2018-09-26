@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Deploy;
 
 use \Jiny\Core\Registry;
@@ -14,12 +22,17 @@ class Server
     public $_conn;
     public $_ignore;
 
+
+    /**
+     * 
+     */
     public function __construct($cli)
     {
         //echo __CLASS__."를 생성합니다.\n";
         $this->CLI = $cli;
         $this->FTP = new \Jiny\Lamp\Ftp\Client($cli);
     }
+
 
     /**
      * 배포 프로세서
@@ -40,6 +53,7 @@ class Server
             echo "배포할 디렉토리가 없습니다.\n";
         }
     }
+
 
     /**
      * 신규배포를 시작합니다.
@@ -112,6 +126,7 @@ class Server
 
     }
 
+
     /**
      * 디렉토리를 배포합니다.
      */
@@ -155,6 +170,7 @@ class Server
         
     }
 
+
     /**
      * 파일을 업로드 합니다.
      */
@@ -163,6 +179,7 @@ class Server
         $this->FTP->_upload($dir.DS.$value, $value);
     }
 
+    
     /**
      * 파일을 갱신합니다.
      */

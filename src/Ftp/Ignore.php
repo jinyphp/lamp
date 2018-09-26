@@ -1,11 +1,22 @@
 <?php
-
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Ftp;
 
 use \Jiny\Core\Registry\Registry;
 
 trait Ignore
 {
+
+	/**
+	 * 
+	 */
     public function isIgnore($dir, $value)
     {
 		if($dir == ".") $path = $value;
@@ -14,6 +25,10 @@ trait Ignore
         return $this->ignoreMask($path, $this->_ignore);
     }
 
+
+	/**
+	 * 
+	 */
     public function ignoreData($filename = ".ftpignore")
     {
         // 데이터를 읽어옵니다.
@@ -68,5 +83,8 @@ trait Ignore
 		}
 		return $res;
 	}
-    
+	
+	/**
+	 * 
+	 */
 }

@@ -1,5 +1,12 @@
 <?php
-
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Ftp;
 
 use \Jiny\Core\Registry\Registry;
@@ -23,6 +30,7 @@ trait Cmd
         }        
     }
 
+
     /**
      * 디렉토리 생성 구현체
      */
@@ -34,6 +42,7 @@ trait Cmd
             echo "There was a problem while creating ".$path;
         }
     }
+
 
     /**
      * 디렉토리를 삭제합니다.
@@ -74,6 +83,7 @@ trait Cmd
         
     }
 
+
     /**
      * 실제 업로드 구현체
      */
@@ -89,6 +99,7 @@ trait Cmd
 
         fclose($fp);
     }
+
 
     /**
      * ftp 설정파일을 복사합니다.
@@ -127,7 +138,9 @@ trait Cmd
     }
 
 
-
+    /**
+     * 
+     */
     public function rm($argv)
     {
         if (isset($argv[2])) {
@@ -143,6 +156,10 @@ trait Cmd
         }        
     }
 
+
+    /**
+     * 
+     */
     public function ls($argv)
     {
         if (isset($argv[2])) {
@@ -160,6 +177,6 @@ trait Cmd
     }
 
     /**
-     * Class End
+     * 
      */
 }

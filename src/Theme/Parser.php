@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Theme;
 
 use \Jiny\Core\Registry;
@@ -19,16 +27,28 @@ class Parser
 
     public $_pos=[];
 
+
+    /**
+     * 
+     */
     public function __construct()
     {
         $this->_path = "./theme/";
     }
 
+
+    /**
+     * 
+     */
     public function setTheme($name)
     {
         $this->_theme = $name;
     }
 
+
+    /**
+     * 
+     */
     public function process($html)
     {
         $this->_html = $html;
@@ -41,6 +61,10 @@ class Parser
         file_put_contents($this->_path.$this->_theme.DS."layout.htm", $this->_html );
     }
 
+
+    /**
+     * 
+     */
     public function exHead()
     {
         /*
@@ -58,6 +82,10 @@ class Parser
         return $this;
     }
 
+
+    /**
+     * 
+     */
     public function exHeader()
     {
         echo "BODY에서 Header 영역을 분리합니다.\n";
@@ -80,6 +108,10 @@ class Parser
 
     }
 
+
+    /**
+     * 
+     */
     public function exIndex()
     {
         print_r($this->_pos);
@@ -127,6 +159,10 @@ layout: layout
         file_put_contents($this->_path.$this->_theme.DS."index.htm", $string);
     }
 
+
+    /**
+     * 
+     */
     public function getTagBody($html, $tag)
     {
         $start = strpos($html,$tag,0);
@@ -153,4 +189,8 @@ layout: layout
         }
         
     }
+
+    /**
+     * 
+     */
 }

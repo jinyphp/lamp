@@ -1,8 +1,8 @@
 {
     "name": "jiny/lamp",
-    "description": "jiny console",
+    "description": "jinyPHP CLI",
     "keywords": [
-        "jiny",
+        "jinyPHP",
         "framwork",
         "console",
         "lamp"

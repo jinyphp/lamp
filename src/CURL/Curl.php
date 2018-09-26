@@ -1,15 +1,30 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\CURL;
 
 use \Jiny\Core\Registry;
 
 class Curl
 {
+    /**
+     * 
+     */
     public function __construct()
     {
         //echo __CLASS__."를 생성합니다.\n";
     }
 
+
+    /**
+     * 
+     */
     public function download($url, $filename) {
         if (extension_loaded("curl")) {
             echo "cURL 파일을 다운로드 합니다. \n";
@@ -28,5 +43,8 @@ class Curl
         }
     }
 
+    /**
+     * 
+     */
 }
 

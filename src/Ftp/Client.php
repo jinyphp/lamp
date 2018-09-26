@@ -1,10 +1,16 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Ftp;
 
 use \Jiny\Core\Registry;
-/**
- * http://php.net/manual/en/book.ftp.php
- */
+
 class Client
 {
     public $CLI;
@@ -17,6 +23,9 @@ class Client
 
     use Cmd, Process, Ignore;
 
+    /**
+     * 
+     */
     public function __construct($cli)
     {
         $this->CLI = $cli;
@@ -53,6 +62,7 @@ class Client
         }
     }
 
+
     /**
      * 배포 루트 디렉토리 설정시
      */
@@ -66,6 +76,7 @@ class Client
             $this->pwd(); 
         }
     }
+
 
     /**
      * 설정파일을 읽어옵니다.
@@ -89,6 +100,10 @@ class Client
         return $user[$key];
     }
 
+
+    /**
+     * 
+     */
     public function connect($_server)
     { 
         echo "connect to ".$_server['host']."\n";
@@ -100,6 +115,7 @@ class Client
         return ftp_login($this->_conn, $_server['user'], $_server['pass']);  
     }
 
+
     /**
      * 패시브 모드
      */
@@ -109,6 +125,10 @@ class Client
         ftp_pasv($this->_conn, true);
     }
 
+
+    /**
+     * 
+     */
     public function load($path)
     {
         // 내용이 있는 경우만 처리
@@ -154,13 +174,14 @@ class Client
 
     }
 
-        /**
+    /**
      * FTP 현재의 경로를 반환합니다.
      */
     public function pwd()
     {
         return ftp_pwd($this->_conn);
     }
+
 
     /**
      * FTP 상위 디렉토리 이동합니다.
@@ -173,6 +194,7 @@ class Client
             //echo "cdup not successful\n";
         }
     }
+
 
     /**
      * FTP 디렉토리를 변경합니다.
@@ -187,6 +209,7 @@ class Client
             return false;
         }
     }
+
 
     /**
      * FTP 디렉토리를 변경합니다.
@@ -210,6 +233,7 @@ class Client
         }
     }
 
+    
     /**
      * FTP 접속을 종료합니다.
      */

@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp;
 
 use Sunra\PhpSimple\HtmlDomParser;
@@ -21,6 +29,9 @@ class CLI extends CliAbstract
     public $_argv;
     public $_mode, $_command;
 
+    /**
+     * 
+     */
     public function __construct($argv)
     {
         if($argv) {
@@ -31,6 +42,10 @@ class CLI extends CliAbstract
         }        
     }
 
+
+    /**
+     * 
+     */
     private function help()
     {
         echo "CLI Lamp ".self::VERSION."\n\n";
@@ -40,6 +55,10 @@ class CLI extends CliAbstract
         echo $msg;
     }
 
+
+    /**
+     * 
+     */
     private function parser($argv)
     {
         if ($this->isAction($argv)) {
@@ -56,6 +75,9 @@ class CLI extends CliAbstract
     }
 
     
+    /**
+     * 
+     */
     public function process($argv)
     {
         switch ($argv[1]) {
@@ -78,6 +100,10 @@ class CLI extends CliAbstract
         unset($cli);
     }
 
+
+    /**
+     * 
+     */
     public function isAction($argv)
     {
         if (isset($argv[1])) {
@@ -89,6 +115,10 @@ class CLI extends CliAbstract
         }
     }
 
+
+    /**
+     * 
+     */
     public function isMode($key)
     {
         $arr = \explode(":", $key);
@@ -102,6 +132,7 @@ class CLI extends CliAbstract
         return $arr;
     }
 
+
     /**
      * FTP 명령을 수행합니다.
      */
@@ -109,6 +140,7 @@ class CLI extends CliAbstract
     {
         return new \Jiny\Lamp\FTP\Client($this);
     }
+
 
     /**
      * FTP 배포를 진행합니다.
@@ -118,16 +150,23 @@ class CLI extends CliAbstract
         return new \Jiny\Lamp\Deploy\Server($this);
     }
 
+
+    /**
+     * 
+     */
     public function theme()
     {
         return new \Jiny\Lamp\Theme\Theme($this);
     }
 
+
+    /**
+     * 
+     */
     public function menu()
     {
         return new \Jiny\Lamp\Menu\Menu($this);
     }
-
 
     /**
      * Class End

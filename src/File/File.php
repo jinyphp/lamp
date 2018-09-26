@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\File;
 
 use Sunra\PhpSimple\HtmlDomParser;
@@ -12,6 +20,7 @@ class File
     public $CLI;
     public $fileSystem;
 
+
     /**
      * 초기화
      */
@@ -20,6 +29,7 @@ class File
         $this->CLI = $cli;
         $this->fileSystem = new Filesystem();
     }
+
 
     /**
      * 명령을 수행합니다.
@@ -39,6 +49,10 @@ class File
         }     
     }
 
+
+    /**
+     * 
+     */
     public function list($argv)
     {
         echo "메뉴\n";
@@ -48,6 +62,10 @@ class File
         print_r($tree);
     }
 
+
+    /**
+     * 
+     */
     public function tree($path, $level=0)
     {
         // 재귀호출 카운트
@@ -85,4 +103,8 @@ class File
             return $tree;        
         }
     }
+
+    /**
+     * 
+     */
 }

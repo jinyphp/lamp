@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Theme;
 
 use Sunra\PhpSimple\HtmlDomParser;
@@ -23,6 +31,7 @@ class Theme
 
         $this->fileSystem = new Filesystem();
     }
+
 
     /**
      * 명령을 수행합니다.
@@ -68,6 +77,10 @@ class Theme
         } 
     }
 
+
+    /**
+     * 
+     */
     public function delete($argv)
     {
         if ($this->isThemeName($argv)) {
@@ -131,6 +144,10 @@ class Theme
         }
     }
 
+
+    /**
+     * 
+     */
     public function set($argv)
     {
         if ($this->isThemeName($argv)) {
@@ -151,6 +168,7 @@ class Theme
 
     }
 
+
     /**
      * 테마명 입력을 확인합니다.
      */
@@ -163,6 +181,7 @@ class Theme
         echo "테마명을 입력해 주세요\n";         
         return false;
     }
+
 
     /** 
      * 테마 폴더의 존재를 확인합니다.
@@ -177,6 +196,10 @@ class Theme
         return false; 
     }
 
+
+    /**
+     * 
+     */
     public function geturl($argv)
     {
         if (!$this->isThemeName($argv)) {
@@ -191,11 +214,19 @@ class Theme
         
     }
 
+
+    /**
+     * 
+     */
     private function path()
     {
         return "./theme/";
     }
 
+
+    /**
+     * 
+     */
     private function download($argv)
     {
         $tempfile = "temp.htm";
@@ -285,6 +316,7 @@ class Theme
         }
     }
 
+
     /**
      * 문서 돔에서 CSS를 다운로드 합니다.
      */
@@ -357,6 +389,7 @@ class Theme
         }
     }
 
+
     /**
      * url의 구조를 파악합니다.
      */
@@ -382,6 +415,7 @@ class Theme
 
     }
 
+
     /**
      * 문서를 정리합니다.
      */
@@ -396,6 +430,10 @@ class Theme
         return $str;
     }
 
+
+    /**
+     * 
+     */
     public function parser($argv)
     {
         if ($this->isThemeName($argv)) {

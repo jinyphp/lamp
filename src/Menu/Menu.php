@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Lamp\Menu;
 
 use Sunra\PhpSimple\HtmlDomParser;
@@ -21,6 +29,7 @@ class Menu
         $this->fileSystem = new Filesystem();
     }
 
+
     /**
      * 명령을 수행합니다.
      */
@@ -39,6 +48,10 @@ class Menu
         }     
     }
 
+
+    /**
+     * 
+     */
     public function list($argv)
     {
         echo "메뉴\n";
@@ -48,6 +61,10 @@ class Menu
         print_r($tree);
     }
 
+
+    /**
+     * 
+     */
     public function tree($path, $level=0)
     {
         // 재귀호출 카운트
@@ -85,4 +102,8 @@ class Menu
             return $tree;        
         }
     }
+
+    /**
+     * 
+     */
 }
